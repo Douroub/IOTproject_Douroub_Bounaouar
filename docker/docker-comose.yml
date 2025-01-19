@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+      - mqtt
+    volumes:
+      - ./backend:/app
+
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.web
+    ports:
+      - "3000:80"
+
+  mongo:
+    image: mongo:5.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  mqtt:
+    image: eclipse-mosquitto
+    container_name: mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_config:/mosquitto/config
+
+volumes:
+  mongodb_data:
+  mosquitto_data:
+  mosquitto_config:

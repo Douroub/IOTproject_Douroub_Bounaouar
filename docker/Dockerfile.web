@@ -1,0 +1,29 @@
+# Utiliser une image officielle Node.js pour construire l'application
+FROM node:16-alpine
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de l'application dans l'image Docker
+COPY ./web_app/package*.json ./
+
+# Installer les dépendances
+RUN npm install
+
+# Copier tout le code source de l'application
+COPY ./web_app /app
+
+# Construire l'application React
+RUN npm run build
+
+# Utiliser une image Nginx pour servir l'application React
+FROM nginx:stable-alpine
+
+# Copier les fichiers construits dans le dossier nginx
+COPY --from=0 /app/build /usr/share/nginx/html
+
+# Exposer le port sur lequel l'application est servie
+EXPOSE 80
+
+# Commande pour démarrer Nginx
+CMD ["nginx", "-g", "daemon off;"]
